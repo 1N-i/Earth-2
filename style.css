@@ -1,0 +1,64 @@
+:root {
+  --red: rgb(226, 16, 16);
+  --green: rgb(48, 167, 48);
+}
+
+img {
+    width: 500px;
+    width: 500px;
+}
+
+.main {
+    display: grid;
+    grid-template-areas:
+        "character info"
+        "character btns"
+        "character percentages";
+    grid-template-columns: auto 1fr;
+    gap: 15px;
+    background-color: rgb(206, 206, 206);
+
+}
+
+.character { grid-area: character; }
+.info { grid-area: info; }
+.btns { grid-area: btns; }
+.percentages { grid-area: percentages; }
+
+#btn-green { background-color: var(--green); }
+#btn-yellow { background-color: rgb(255, 251, 35); }
+#btn-red { background-color: var(--red); }
+
+#btn-green, #btn-yellow, #btn-red {
+    height: 100px;
+    width: 100px;
+    border: solid 5px lightslategray;
+    border-radius: 50px;
+    transition: 0.2s;
+}
+
+#btn-green:hover, #btn-yellow:hover, #btn-red:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+}
+
+#btn-green:active, #btn-yellow:active, #btn-red:active {
+    cursor: pointer;
+    transform: scale(0.95);
+}
+
+#percentage-red {
+    width: 300px;
+    border: 3px solid rgb(136, 136, 136);
+    color: var(--red);
+    background-color: var(--red);
+    padding: 0;
+}
+
+#percentage-green {
+    color: var(--green);
+    background-color: var(--green);
+    height: 15px;
+    text-align: left;
+    width: 75%;
+}
