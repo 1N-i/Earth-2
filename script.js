@@ -1,3 +1,10 @@
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
+
 const humans = [
     {
         "img": "human-image/human1.png",
@@ -83,23 +90,36 @@ const percentage = document.getElementById("percentages")
 const greenPercentage = document.getElementById("percentage-green")
 percentage.style.visibility = "hidden"
 
-function showPercentage(button) {
-    const num = 75
+async function showPercentage(button) {
     if (!percentageIsShowing) {
-        if (button === "green") {
-            //Adds value for saving that human
-        }
-        if (button === "red") {
-            //Adds value for 'defeating' that human
-        }
-        info.style.visibility = "hidden"
-        photo.style.visibility = "hidden"
-        percentage.style.visibility = "visible"
-        greenPercentage.style.width = `${num}%`
+        const currentId = humanIdx; 
 
+        if (button === "green" || button === "red") {
+            await supabase.rpc('vote_candidate', { 
+                candidate_id: currentId, 
+                vote_type: button 
+            });
+        }
+
+        const { data, error } = await supabase
+            .from('candidates')
+            .select('vote_green, vote_red')
+            .eq('id', currentId)
+            .single();
+
+        if (!error && data) {
+            const total = data.vote_green + data.vote_red;
+            const percentageGreenVal = total > 0 ? Math.round((data.vote_green / total) * 100) : 50;
+            
+            greenPercentage.style.width = `${percentageGreenVal}%`;
+        }
+
+        info.style.visibility = "hidden";
+        photo.style.visibility = "hidden";
+        percentage.style.visibility = "visible";
     } else {
-        percentage.style.visibility = "hidden"
+        percentage.style.visibility = "hidden";
     }
 
-    percentageIsShowing = !percentageIsShowing
+    percentageIsShowing = !percentageIsShowing;
 }
