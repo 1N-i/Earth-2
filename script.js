@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
@@ -16,7 +16,7 @@ const info = document.getElementById("info")
 const percentage = document.getElementById("percentages")
 const greenPercentage = document.getElementById("percentage-green")
 
-// 1. Buscar os candidatos do Supabase ao iniciar o jogo
+// Search the characters
 async function fetchCandidates() {
     const { data, error } = await supabase
         .from('candidates')
@@ -34,7 +34,7 @@ async function fetchCandidates() {
     }
 }
 
-// 2. Atualizar as informações na tela
+// Update the info on screen
 function updateInfo() {
     if (humans.length === 0) return
 
@@ -44,62 +44,60 @@ function updateInfo() {
     info.style.visibility = "visible"
     percentage.style.visibility = "hidden"
 
-    // Supondo que no banco as colunas sejam: img, name, age, job, pros (array), cons (array)
-    photo.innerHTML = `<img src="${human.img}">`
+    const prosList = Array.isArray(human.pros) ? human.pros : (typeof human.pros === 'string' ? JSON.parse(human.pros) : ["Sem prós cadastrados", ""])
+    const consList = Array.isArray(human.cons) ? human.cons : (typeof human.cons === 'string' ? JSON.parse(human.cons) : ["Sem contras cadastrados", ""])
+
+    photo.innerHTML = `<img src="${human.img || ''}" alt="Candidato">`
 
     info.innerHTML = `
-        <h1>${human.name}</h1>
-        <h3>${human.age} years • ${human.job}</h3>
-        <h4>PROS</h4>
+        <h1>${human.name || 'Sem Nome'}</h1>
+        <h3>${human.age || 0} anos • ${human.job || 'Profissão não informada'}</h3>
+        <h4>PRÓS</h4>
         <ul>
-            <li>✔ ${human.pros[0]}</li>
-            <li>✔ ${human.pros[1]}</li>
+            <li>✔ ${prosList[0] || ''}</li>
+            <li>✔ ${prosList[1] || ''}</li>
         </ul>
-        <h4>CONS</h4>
+        <h4>CONTRAS</h4>
         <ul>
-            <li>✖ ${human.cons[0]}</li>
-            <li>✖ ${human.cons[1]}</li>
+            <li>✖ ${consList[0] || ''}</li>
+            <li>✖ ${consList[1] || ''}</li>
         </ul>
     `
 }
 
-// Botão Amarelo: Vai para o próximo personagem ou fecha a tela de porcentagem
+// Calls the next character
 btnYellow.addEventListener("click", () => {
     if (percentageIsShowing) {
         percentageIsShowing = false
         percentage.style.visibility = "hidden"
         
-        // Avança para o próximo índice antes de atualizar a UI
         humanIdx = (humanIdx + 1) % humans.length
         updateInfo()
     }
 })
 
-// Botão Verde (Terra 2 / Aprovar)
+// Send human to Earth 2
 btnGreen.addEventListener("click", async () => {
     if (!percentageIsShowing) {
         await handleVote("green")
     }
 })
 
-// Botão Vermelho (Eliminar / Morrer)
+// Defeat human
 btnRed.addEventListener("click", async () => {
     if (!percentageIsShowing) {
         await handleVote("red")
     }
 })
 
-// 3. Função para computar o voto e buscar a porcentagem real atualizada
+//Compute vote
 async function handleVote(buttonType) {
     const currentHuman = humans[humanIdx]
-    // Identificador único do candidato no banco (pode ser o ID gerado pelo banco ou o índice)
     const candidateId = currentHuman.id ?? humanIdx + 1
 
-    // Mapeia o tipo de voto para a coluna/parâmetro correspondente
     const voteColumn = buttonType === "green" ? "vote_green" : "vote_red"
 
     try {
-        // Se estiver usando a RPC do Supabase criada no banco
         const { error: rpcError } = await supabase.rpc('vote_candidate', { 
             candidate_id: candidateId, 
             vote_type: buttonType 
@@ -108,7 +106,6 @@ async function handleVote(buttonType) {
         if (rpcError) {
             console.warn("RPC não encontrada ou com erro, tentando update direto...", rpcError)
             
-            // Fallback de incremento direto caso a RPC não exista
             const currentVotes = currentHuman[voteColumn] || 0
             await supabase
                 .from('candidates')
@@ -125,8 +122,11 @@ async function handleVote(buttonType) {
         if (!error && data) {
             const total = (data.vote_green || 0) + (data.vote_red || 0)
             const percentageGreenVal = total > 0 ? Math.round(((data.vote_green || 0) / total) * 100) : 50
+            const percentageRedVal = 100 - percentageGreenVal
             
             greenPercentage.style.width = `${percentageGreenVal}%`
+            document.getElementById("val-green").innerText = `${percentageGreenVal}%`
+            document.getElementById("val-red").innerText = `${percentageRedVal}%`
 
             currentHuman.vote_green = data.vote_green
             currentHuman.vote_red = data.vote_red
@@ -142,5 +142,4 @@ async function handleVote(buttonType) {
     }
 }
 
-// Inicializa o app buscando os dados do Supabase
 fetchCandidates()
