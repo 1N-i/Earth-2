@@ -4,122 +4,143 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
-
-const humans = [
-    {
-        "img": "human-image/human1.png",
-        "name": "HELENA VANCE",
-        "age": 34,
-        "job": "Agricultural Engineer",
-        "pros": ["Mastered the purification of radioactive soil", "Calm demeanor in crisis situations"],
-        "cons": ["Infertile", "Refuses to work in a team"]
-    },
-    {
-        "img": "human-image/human2.png",
-        "name": "CHARLES LINCE",
-        "age": 39,
-        "job": "Surgeon",
-        "pros": ["Rich", "Works well under pressure"],
-        "cons": ["Huge narcissist", "Don't agree with critics"]
-    }
-]
-
+let humans = []
 let humanIdx = 0
+let percentageIsShowing = false
+
 const btnYellow = document.getElementById("btn-yellow")
-btnYellow.addEventListener("click", () => {
-    if (percentageIsShowing) {
-        updateInfo(humanIdx)
-        percentageIsShowing = false
-        percentage.style.visibility = "hidden"
-    }
-})
-
+const btnGreen = document.getElementById("btn-green")
+const btnRed = document.getElementById("btn-red")
 const photo = document.getElementById("character")
-photo.style.visibility = "hidden"
 const info = document.getElementById("info")
-info.style.visibility = "hidden"
+const percentage = document.getElementById("percentages")
+const greenPercentage = document.getElementById("percentage-green")
 
-function updateInfo(hIdx) {
-    const human = humans[hIdx]
+// 1. Buscar os candidatos do Supabase ao iniciar o jogo
+async function fetchCandidates() {
+    const { data, error } = await supabase
+        .from('candidates')
+        .select('*')
+        .order('id', { ascending: true })
 
-    photo.style.visibility = "visible"    
-    info.style.visibility = "visible"
+    if (error) {
+        console.error("Erro ao buscar candidatos:", error)
+        return
+    }
 
-    photo.innerHTML = `<img src="${human["img"]}">`
-
-    info.innerHTML = ""
-    info.innerHTML += `<h1>${human["name"]}</h1>`
-    info.innerHTML += `<h3>${human["age"]} years • ${human["job"]}</h3>`
-
-    info.innerHTML += "<h4>PROS</h4>"
-    info.innerHTML += "<ul>"
-    info.innerHTML += `    <li>✔ ${human["pros"][0]}</li>`
-    info.innerHTML += `    <li>✔ ${human["pros"][1]}</li>`
-    info.innerHTML += "</ul>"
-
-    info.innerHTML += "<h4>CONS</h4>"
-    info.innerHTML += "<ul>"
-    info.innerHTML += `    <li>✖ ${human["cons"][0]}</li>`
-    info.innerHTML += `    <li>✖ ${human["cons"][1]}</li>`
-    info.innerHTML += "</ul>"
-
-    humanIdx += 1
-    if (humanIdx === humans.length) {
-        humanIdx = 0
+    if (data && data.length > 0) {
+        humans = data
+        updateInfo() // Exibe o primeiro personagem após carregar
     }
 }
 
+// 2. Atualizar as informações na tela
+function updateInfo() {
+    if (humans.length === 0) return
 
-let percentageIsShowing = true
-const btnGreen = document.getElementById("btn-green")
-btnGreen.addEventListener("click", () => {
-    if (!percentageIsShowing) {
-        showPercentage("green")
+    const human = humans[humanIdx]
+
+    photo.style.visibility = "visible"    
+    info.style.visibility = "visible"
+    percentage.style.visibility = "hidden"
+
+    // Supondo que no banco as colunas sejam: img, name, age, job, pros (array), cons (array)
+    photo.innerHTML = `<img src="${human.img}">`
+
+    info.innerHTML = `
+        <h1>${human.name}</h1>
+        <h3>${human.age} years • ${human.job}</h3>
+        <h4>PROS</h4>
+        <ul>
+            <li>✔ ${human.pros[0]}</li>
+            <li>✔ ${human.pros[1]}</li>
+        </ul>
+        <h4>CONS</h4>
+        <ul>
+            <li>✖ ${human.cons[0]}</li>
+            <li>✖ ${human.cons[1]}</li>
+        </ul>
+    `
+}
+
+// Botão Amarelo: Vai para o próximo personagem ou fecha a tela de porcentagem
+btnYellow.addEventListener("click", () => {
+    if (percentageIsShowing) {
+        percentageIsShowing = false
+        percentage.style.visibility = "hidden"
+        
+        // Avança para o próximo índice antes de atualizar a UI
+        humanIdx = (humanIdx + 1) % humans.length
+        updateInfo()
     }
 })
 
-const btnRed = document.getElementById("btn-red")
-btnRed.addEventListener("click", () => {
+// Botão Verde (Terra 2 / Aprovar)
+btnGreen.addEventListener("click", async () => {
     if (!percentageIsShowing) {
-        showPercentage("red")
+        await handleVote("green")
     }
 })
 
-
-const percentage = document.getElementById("percentages")
-const greenPercentage = document.getElementById("percentage-green")
-percentage.style.visibility = "hidden"
-
-async function showPercentage(button) {
+// Botão Vermelho (Eliminar / Morrer)
+btnRed.addEventListener("click", async () => {
     if (!percentageIsShowing) {
-        const currentId = humanIdx; 
+        await handleVote("red")
+    }
+})
 
-        if (button === "green" || button === "red") {
-            await supabase.rpc('vote_candidate', { 
-                candidate_id: currentId, 
-                vote_type: button 
-            });
+// 3. Função para computar o voto e buscar a porcentagem real atualizada
+async function handleVote(buttonType) {
+    const currentHuman = humans[humanIdx]
+    // Identificador único do candidato no banco (pode ser o ID gerado pelo banco ou o índice)
+    const candidateId = currentHuman.id ?? humanIdx + 1
+
+    // Mapeia o tipo de voto para a coluna/parâmetro correspondente
+    const voteColumn = buttonType === "green" ? "vote_green" : "vote_red"
+
+    try {
+        // Se estiver usando a RPC do Supabase criada no banco
+        const { error: rpcError } = await supabase.rpc('vote_candidate', { 
+            candidate_id: candidateId, 
+            vote_type: buttonType 
+        })
+
+        if (rpcError) {
+            console.warn("RPC não encontrada ou com erro, tentando update direto...", rpcError)
+            
+            // Fallback de incremento direto caso a RPC não exista
+            const currentVotes = currentHuman[voteColumn] || 0
+            await supabase
+                .from('candidates')
+                .update({ [voteColumn]: currentVotes + 1 })
+                .eq('id', candidateId)
         }
 
         const { data, error } = await supabase
             .from('candidates')
             .select('vote_green, vote_red')
-            .eq('id', currentId)
-            .single();
+            .eq('id', candidateId)
+            .single()
 
         if (!error && data) {
-            const total = data.vote_green + data.vote_red;
-            const percentageGreenVal = total > 0 ? Math.round((data.vote_green / total) * 100) : 50;
+            const total = (data.vote_green || 0) + (data.vote_red || 0)
+            const percentageGreenVal = total > 0 ? Math.round(((data.vote_green || 0) / total) * 100) : 50
             
-            greenPercentage.style.width = `${percentageGreenVal}%`;
+            greenPercentage.style.width = `${percentageGreenVal}%`
+
+            currentHuman.vote_green = data.vote_green
+            currentHuman.vote_red = data.vote_red
         }
 
-        info.style.visibility = "hidden";
-        photo.style.visibility = "hidden";
-        percentage.style.visibility = "visible";
-    } else {
-        percentage.style.visibility = "hidden";
-    }
+        info.style.visibility = "hidden"
+        photo.style.visibility = "hidden"
+        percentage.style.visibility = "visible"
+        percentageIsShowing = true
 
-    percentageIsShowing = !percentageIsShowing;
+    } catch (err) {
+        console.error("Erro ao registrar voto:", err)
+    }
 }
+
+// Inicializa o app buscando os dados do Supabase
+fetchCandidates()
