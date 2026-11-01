@@ -1,47 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
     <head>
         <meta charset="UTF-8">
-        <title>Earth 2</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Terra 2</title>
         <link rel="stylesheet" href="style.css">
     </head>
 
     <body>
         <div class="main">
-            <!-- Character image or GIF -->
+            <!-- Character Image -->
             <div class="character" id="character">
-                <img src="human-image/human1.png">
+                <img src="human-image/human1.png" alt="Candidato">
             </div>
 
-            <!-- Character info -->
+            <!-- Character Info -->
             <div class="info" id="info">
-                <h1>HELENA VANCE</h1>
-                <h3>34 years • Agricultural Engineer</h3>
+                <h1>CARREGANDO...</h1>
+                <h3>-- anos • ---</h3>
 
-                <h4>PROS</h4>
+                <h4>PRÓS</h4>
                 <ul>
-                    <li>✔ Mastered the purification of radioactive soil</li>
-                    <li>✔ Calm demeanor in crisis situations</li>
+                    <li>Carregando...</li>
                 </ul>
 
-                <h4>CONS</h4>
+                <h4>CONTRAS</h4>
                 <ul>
-                    <li>✖ Infertile</li>
-                    <li>✖ Refuses to work in a team</li>
+                    <li>Carregando...</li>
                 </ul>
             </div>
 
-            <!-- Buttons -->
-            <div class="btns">
-                <button id="btn-green"></button>  <!-- Btn to send to Earth 2 -->
-                <button id="btn-yellow"></button> <!-- Btn to call next human -->
-                <button id="btn-red"></button>    <!-- Btn to "defeat" human -->
-            </div>
-
-            <!-- Percentages -->
-             <div class="percentages" id="percentages">
-                <div id="percentage-red"><div id="percentage-green"></div></div> 
+            <!-- Percentage data -->
+            <div class="percentages" id="percentages">
+                <div class="percentage-label">
+                    <span style="color: var(--green);">Terra 2: <span id="val-green">50%</span></span>
+                    <span style="color: var(--red);">Eliminados: <span id="val-red">50%</span></span>
+                </div>
+                <div id="percentage-bar-container">
+                    <div id="percentage-green"></div> 
+                </div>
              </div>
+
+            <!-- Action Button -->
+            <div class="btns">
+                <button id="btn-green" title="Send to Earth 2"></button> <!-- Btn to send to Earth 2 -->
+                <button id="btn-yellow" title="Next"></button>           <!-- Btn to call next human -->
+                <button id="btn-red" title="Defeat"></button>            <!-- Btn to "defeat" human -->
+            </div>
         </div>
 
         <script type="module" src="script.js"></script>
