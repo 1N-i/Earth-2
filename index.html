@@ -8,8 +8,27 @@
     </head>
 
     <body>
-        <div class="main">
-            <!-- Character Image -->
+        <!-- Introduction -->
+        <div id="welcome-modal" class="modal-overlay">
+            <div class="modal-content">
+                <h1 id="intro-title">🌍 Terra 2 / Earth 2</h1>
+                <p id="intro-text">Selecione seu idioma para começar:</p>
+                
+                <div class="lang-btns">
+                    <button id="btn-pt" class="lang-btn">Português 🇧🇷</button>
+                    <button id="btn-en" class="lang-btn">English 🇺🇸</button>
+                </div>
+
+                <div id="story-box" style="display: none;">
+                    <p id="story-text"></p>
+                    <button id="btn-start" class="start-btn">Começar Julgamento</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main game -->
+        <div class="main" id="game-container" style="display: none;">
+            <!-- Character img -->
             <div class="character" id="character">
                 <img src="human-image/human1.png" alt="Candidato">
             </div>
@@ -20,12 +39,12 @@
                 <h3>-- anos • ---</h3>
 
                 <h4>PROS</h4>
-                <ul>
+                <ul id="list-pros">
                     <li>Loading...</li>
                 </ul>
 
                 <h4>CONS</h4>
-                <ul>
+                <ul id="list-cons">
                     <li>Loading...</li>
                 </ul>
             </div>
@@ -33,8 +52,8 @@
             <!-- Percentage data -->
             <div class="percentages" id="percentages">
                 <div class="percentage-label">
-                    <span style="color: var(--green);">Earth 2: <span id="val-green">50%</span></span>
-                    <span style="color: var(--red);">Defeated: <span id="val-red">50%</span></span>
+                    <span style="color: var(--green);"><span id="label-earth2">Earth 2</span>: <span id="val-green">50%</span></span>
+                    <span style="color: var(--red);"><span id="label-defeated">Defeated</span>: <span id="val-red">50%</span></span>
                 </div>
                 <div id="percentage-bar-container">
                     <div id="percentage-green"></div> 

@@ -176,7 +176,6 @@ body {
   transform: scale(0.95);
 }
 
-/* Responsividade para telas menores */
 @media (max-width: 768px) {
   .main {
     grid-template-areas:
@@ -190,4 +189,79 @@ body {
   .character {
     min-height: 280px;
   }
+}
+
+/* --- Welcome interface --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(10, 10, 20, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background-color: var(--card-bg, #16213e);
+  color: #fff;
+  padding: 40px;
+  border-radius: 20px;
+  max-width: 550px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-content h1 {
+  font-size: 2rem;
+  margin-bottom: 15px;
+  color: #e94560;
+}
+
+.modal-content p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #dcdde1;
+  margin-bottom: 25px;
+}
+
+.lang-btns {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.lang-btn, .start-btn {
+  background-color: #0f3460;
+  color: white;
+  border: 2px solid #e94560;
+  padding: 12px 25px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lang-btn:hover, .start-btn:hover {
+  background-color: #e94560;
+  transform: scale(1.05);
+}
+
+.start-btn {
+  background-color: var(--green, #2ecc71);
+  border-color: #27ae60;
+  width: 100%;
+  margin-top: 15px;
+}
+
+.start-btn:hover {
+  background-color: #27ae60;
 }
