@@ -12,7 +12,7 @@
         <div id="welcome-modal" class="modal-overlay">
             <div class="modal-content">
                 <h1 id="intro-title">🌍 Terra 2 / Earth 2</h1>
-                <p id="intro-text">Selecione seu idioma para começar:</p>
+                <p id="intro-text">Selecione seu idioma para começar: / Select your language to start:</p>
                 
                 <div class="lang-btns">
                     <button id="btn-pt" class="lang-btn">Português 🇧🇷</button>
@@ -21,7 +21,7 @@
 
                 <div id="story-box" style="display: none;">
                     <p id="story-text"></p>
-                    <button id="btn-start" class="start-btn">Começar Julgamento</button>
+                    <button id="btn-start" class="start-btn">Começar Seleção / Start Selection</button>
                 </div>
             </div>
         </div>
@@ -61,10 +61,21 @@
              </div>
 
             <!-- Action Button -->
-            <div class="btns">
-                <button id="btn-green" title="Send to Earth 2"></button> <!-- Btn to send to Earth 2 -->
-                <button id="btn-yellow" title="Next"></button>           <!-- Btn to call next human -->
-                <button id="btn-red" title="Defeat"></button>            <!-- Btn to "defeat" human -->
+            <div class="action-wrapper">
+                <div class="btns">
+                    <div class="btn-group">
+                        <button id="btn-green" title="Send to Earth 2"></button>
+                        <span id="label-btn-green" class="btn-desc">Terra 2</span>  <!-- Btn to send to Earth 2 -->
+                    </div>
+                    <div class="btn-group">
+                        <button id="btn-yellow" title="Next"></button>
+                        <span id="label-btn-yellow" class="btn-desc">Próximo</span> <!-- Btn to call next human -->
+                    </div>
+                    <div class="btn-group">
+                        <button id="btn-red" title="Defeat"></button>
+                        <span id="label-btn-red" class="btn-desc">Eliminar</span>   <!-- Btn to "defeat" human -->
+                    </div>
+                </div>
             </div>
         </div>
 
